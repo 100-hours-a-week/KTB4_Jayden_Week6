@@ -17,18 +17,25 @@ public class ArticleService {
     private Long sequence = 0L;
 
     public ArticleResponse create(ArticleCreateRequest request) {
-        Article article = articleMemoryRepository.save(Article.create(
+        return ArticleResponse.from(articleMemoryRepository.save(Article.create(
                 sequence++,
                 request.getTitle(),
                 request.getContent(),
                 request.getUserId(),
                 request.getContentImages()
-        ));
-        return ArticleResponse.from(article);
+        )));
     }
 
     public ArticleResponse update(Long articleId, ArticleUpdateRequest request) {
-        return null;
+        return ArticleResponse.from(articleMemoryRepository.update(
+                        articleId,
+                        articleMemoryRepository.findById(articleId).update(
+                                request.getTitle(),
+                                request.getContent(),
+                                request.getContentImages()
+                        )
+                )
+        );
     }
 
     public ArticleResponse saveTempArticle(Long userId, ArticleUpdateRequest request) {
@@ -40,15 +47,21 @@ public class ArticleService {
     }
 
     public ArticleResponse delete(Long articleId) {
-        return null;
+        return ArticleResponse.from(
+                articleMemoryRepository.delete(articleId)
+        );
     }
 
     public ArticleResponse read(Long articleId) {
-        return null;
+        return ArticleResponse.from(
+                articleMemoryRepository.findById(articleId)
+        );
     }
 
     public List<ArticleResponse> readInfiniteScroll(Long pageSize, Long lastArticleId) {
-        return null;
+        return articleMemoryRepository.findAllInfiniteScroll(pageSize, lastArticleId).stream()
+                .map(ArticleResponse::from)
+                .toList();
     }
 
     public void report(Long articleId, Long userId) {

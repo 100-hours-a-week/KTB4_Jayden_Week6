@@ -15,17 +15,17 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @PostMapping("/articles")
-    public ArticleResponse create(ArticleCreateRequest request) {
+    public ArticleResponse create(@RequestBody ArticleCreateRequest request) {
         return articleService.create(request);
     }
 
     @PutMapping("/articles/{articleId}")
-    public ArticleResponse update(@PathVariable Long articleId, ArticleUpdateRequest request) {
+    public ArticleResponse update(@PathVariable Long articleId, @RequestBody ArticleUpdateRequest request) {
         return articleService.update(articleId, request);
     }
 
     @PutMapping("/articles/temp-save/{userId}")
-    public ArticleResponse saveTempArticle(@PathVariable Long userId, ArticleUpdateRequest request) {
+    public ArticleResponse saveTempArticle(@PathVariable Long userId, @RequestBody ArticleUpdateRequest request) {
         return articleService.saveTempArticle(userId, request);
     }
 
@@ -48,7 +48,6 @@ public class ArticleController {
     public List<ArticleResponse> readInfiniteScroll(
             @RequestParam("pageSize") Long pageSize,
             @RequestParam(value = "lastArticleId", required = false) Long lastArticleId
-
     ) {
         return articleService.readInfiniteScroll(pageSize, lastArticleId);
     }

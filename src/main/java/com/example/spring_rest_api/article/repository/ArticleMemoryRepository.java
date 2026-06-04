@@ -1,26 +1,47 @@
 package com.example.spring_rest_api.article.repository;
 
 import com.example.spring_rest_api.article.entity.Article;
-import com.example.spring_rest_api.article.service.response.ArticleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 @Repository
 @RequiredArgsConstructor
 public class ArticleMemoryRepository {
-    private final Map<Long, Article> articleStorage = new ConcurrentHashMap<>();
-    private Long sequence = 0L;
+    private final Map<Long, Article> articleStorage = new ConcurrentSkipListMap<>(Comparator.reverseOrder());
 
     public Article save(Article article) {
-        articleStorage.put(article.getArticleId(), article);
-        return articleStorage.get(article.getArticleId());
+        return articleStorage.put(article.getArticleId(), article);
+    }
+
+    public Article update(Long articleId, Article article) {
+        return articleStorage.replace(articleId, article);
+    }
+
+    public Article delete(Long articleId) {
+        Article deleted = findById(articleId).delete();
+        return articleStorage.replace(articleId, deleted);
     }
 
     public Article findById(Long articleId) {
+        return articleStorage.get(articleId);
+    }
 
+    public List<Article> findAllInfiniteScroll(Long pageSize, Long lastArticleId) {
+        return lastArticleId == null ?
+                articleStorage.entrySet().stream()
+                .limit(pageSize)
+                .map(Map.Entry::getValue)
+                .toList() :
+                articleStorage.entrySet().stream()
+                .filter(entry -> entry.getKey() < lastArticleId)
+                .limit(pageSize)
+                .map(Map.Entry::getValue)
+                .toList();
     }
 
 

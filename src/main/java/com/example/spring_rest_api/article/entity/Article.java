@@ -23,10 +23,6 @@ public class Article {
     private boolean isArticleDeleted;
     private boolean isArticleEdited;
 
-    public void incrementId(Long articleId) {
-        this.articleId = articleId;
-    }
-
     public static Article create(Long articleId, String title, String content, Long userId, List<String> contentImages) {
         Article article = new Article();
         article.articleId = articleId;
@@ -44,7 +40,7 @@ public class Article {
         return article;
     }
 
-    public void update(String title, String content, List<String> contentImages) {
+    public Article update(String title, String content, List<String> contentImages) {
         this.title = title;
         this.previousContent = "%s \n %s \n %s"
                 .formatted(this.previousContent, LocalDateTime.now(), this.content);
@@ -53,10 +49,12 @@ public class Article {
         this.contentImages = contentImages;
         this.updatedAt = LocalDateTime.now();
         this.isArticleEdited = true;
+        return this;
     }
 
-    public void delete() {
+    public Article delete() {
         this.isArticleDeleted = true;
         this.deletedAt = LocalDateTime.now();
+        return this;
     }
 }
