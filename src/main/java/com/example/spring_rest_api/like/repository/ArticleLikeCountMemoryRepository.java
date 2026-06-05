@@ -14,14 +14,24 @@ public class ArticleLikeCountMemoryRepository {
     private final Map<Long, ArticleLikeCount> articleLikeCountStorage =  new ConcurrentHashMap<>();
 
     public Long read(Long articleId) {
-        return articleLikeCountStorage.get(articleId).getLikeCount();
+        return articleLikeCountStorage.containsKey(articleId) ?
+                articleLikeCountStorage.get(articleId).getLikeCount() :
+                0L;
     }
 
     public void increase(Long articleId) {
-        articleLikeCountStorage.put(articleId, articleLikeCountStorage.get(articleId).increase());
+        if (articleLikeCountStorage.containsKey(articleId)) {
+            articleLikeCountStorage.put(articleId, articleLikeCountStorage.get(articleId).increase());
+        } else {
+            articleLikeCountStorage.put(articleId, ArticleLikeCount.init(articleId, 1L));
+        }
     }
 
     public void decrease(Long articleId) {
-        articleLikeCountStorage.put(articleId, articleLikeCountStorage.get(articleId).decrease());
+        if (articleLikeCountStorage.containsKey(articleId)) {
+            articleLikeCountStorage.put(articleId, articleLikeCountStorage.get(articleId).decrease());
+        } else {
+            articleLikeCountStorage.put(articleId, ArticleLikeCount.init(articleId, 0L));
+        }
     }
 }
