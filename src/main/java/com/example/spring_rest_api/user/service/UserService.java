@@ -32,7 +32,6 @@ public class UserService {
         return UserResponse.from(userMemoryRepository.update(
                 userId,
                 userMemoryRepository.findById(userId).updateInformation(
-                        userId,
                         request.getNickname(),
                         request.getProfileImage()
                 )

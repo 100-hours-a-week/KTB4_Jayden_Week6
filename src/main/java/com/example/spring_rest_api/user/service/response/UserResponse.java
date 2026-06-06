@@ -11,6 +11,8 @@ public class UserResponse {
     private String password;
     private String nickname;
     private String profileImage;
+    private boolean isUserDeleted;
+
 
     public static UserResponse from(User user) {
         UserResponse userResponse = new UserResponse();
@@ -18,6 +20,7 @@ public class UserResponse {
         userResponse.password = user.getPassword();
         userResponse.nickname = user.getNickname();
         userResponse.profileImage = user.getProfileImage();
+        userResponse.isUserDeleted = user.isUserDeleted();
         return userResponse;
     }
 }

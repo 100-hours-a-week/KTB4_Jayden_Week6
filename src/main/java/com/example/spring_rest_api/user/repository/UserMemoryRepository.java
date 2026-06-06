@@ -1,10 +1,12 @@
 package com.example.spring_rest_api.user.repository;
 
+import com.example.spring_rest_api.common.exception.NotFoundException;
 import com.example.spring_rest_api.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
@@ -13,19 +15,23 @@ public class UserMemoryRepository {
     private final Map<Long, User> userStorage = new ConcurrentHashMap<>();
 
     public User create(User user) {
-        return userStorage.put(user.getUserId(), user);
+        userStorage.put(user.getUserId(), user);
+        return findById(user.getUserId());
     }
 
     public User findById(Long userId) {
-        return userStorage.get(userId);
+        return Optional.ofNullable(userStorage.get(userId))
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND"));
     }
 
     public User update(Long userId, User user) {
-        return userStorage.put(userId, user);
+        userStorage.replace(userId, user);
+        return findById(userId);
     }
 
     public User delete(Long userId) {
         User deleted = findById(userId).delete();
-        return userStorage.put(userId, deleted);
+        userStorage.replace(userId, deleted);
+        return findById(userId);
     }
 }

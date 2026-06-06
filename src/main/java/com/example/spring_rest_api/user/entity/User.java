@@ -38,8 +38,7 @@ public class User {
         return user;
     }
 
-    public User updateInformation(Long userId, String nickname, String profileImage) {
-        this.userId = userId;
+    public User updateInformation(String nickname, String profileImage) {
         this.nickname = nickname;
         this.profileImage = profileImage;
         this.informationUpdatedAt = LocalDateTime.now();
