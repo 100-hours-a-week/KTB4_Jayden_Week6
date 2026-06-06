@@ -25,7 +25,8 @@ public class ArticleLikeMemoryRepository {
     }
 
     public ArticleLike save(ArticleLike articleLike) {
-        return articleLikeStorage.put(articleLike.getArticleLikeId(), articleLike);
+        articleLikeStorage.put(articleLike.getArticleLikeId(), articleLike);
+        return articleLikeStorage.get(articleLike.getArticleLikeId());
     }
 
     public void delete(ArticleLike articleLike) {

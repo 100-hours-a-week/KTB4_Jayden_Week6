@@ -14,13 +14,12 @@ public class ArticleReportMemoryRepository {
     private Long sequence = 0L;
 
     public Report findByArticleIdAndReportingUserId(Long articleId, Long reportingUserId) {
-        return articleReportStorage.entrySet().stream()
-                .filter(entry ->
-                        entry.getValue().getArticleId().equals(articleId) &&
-                                entry.getValue().getReportingUserId().equals(reportingUserId)
+        return articleReportStorage.values().stream()
+                .filter(report ->
+                        report.getArticleId().equals(articleId) &&
+                                report.getReportingUserId().equals(reportingUserId)
                 )
                 .findFirst()
-                .map(Map.Entry::getValue)
                 .orElse(null);
     }
 

@@ -18,16 +18,19 @@ public class CommentMemoryRepository {
     private final Map<Long, Comment> commentStorage = new ConcurrentSkipListMap<>();
 
     public Comment save(Comment comment) {
-        return commentStorage.put(comment.getCommentId(), comment);
+        commentStorage.put(comment.getCommentId(), comment);
+        return commentStorage.get(comment.getCommentId());
     }
 
     public Comment update(Comment comment) {
-        return commentStorage.replace(comment.getCommentId(), comment);
+        commentStorage.replace(comment.getCommentId(), comment);
+        return findById(comment.getCommentId());
     }
 
     public Comment delete(Comment comment) {
-        Comment deleted = findById(comment.getCommentId()).delete();
-        return commentStorage.replace(comment.getCommentId(), deleted);
+        Comment deleted = findById(comment.getCommentId());
+        commentStorage.replace(comment.getCommentId(), deleted);
+        return findById(comment.getCommentId());
     }
 
     public Comment findById(Long commentId) {

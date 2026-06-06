@@ -14,14 +14,13 @@ public class ArticleViewMemoryRepository {
     private final Map<Long, ArticleView> articleViewStorage = new ConcurrentHashMap<>();
 
     public ArticleView findByArticleIdAndUserId(Long articleId, Long userId) {
-        return articleViewStorage.entrySet().stream()
+        return articleViewStorage.values().stream()
                 .filter(
-                        entry ->
-                                entry.getValue().getArticleId().equals(articleId) &&
-                                        entry.getValue().getUserId().equals(userId)
+                        articleView ->
+                                articleView.getArticleId().equals(articleId) &&
+                                        articleView.getUserId().equals(userId)
                 )
                 .findFirst()
-                .map(Map.Entry::getValue)
                 .orElse(null);
     }
 

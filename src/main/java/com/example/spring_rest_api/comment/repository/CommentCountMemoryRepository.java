@@ -16,7 +16,7 @@ public class CommentCountMemoryRepository {
 
     public Long read(Long articleId) {
         return Optional.ofNullable(commentCountStorage.getOrDefault(articleId, 0L))
-                .orElseThrow(() -> new NotFoundException("ARTICLE_NOT_FOUND"));
+                .orElseThrow(() -> new NotFoundException("COMMENT_COUNT_NOT_FOUND"));
     }
 
     public void increase(Long articleId) {

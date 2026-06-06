@@ -17,16 +17,19 @@ public class ArticleMemoryRepository {
     private final Map<Long, Article> articleStorage = new ConcurrentSkipListMap<>(Comparator.reverseOrder());
 
     public Article save(Article article) {
-        return articleStorage.put(article.getArticleId(), article);
+        articleStorage.put(article.getArticleId(), article);
+        return findById(article.getArticleId());
     }
 
     public Article update(Long articleId, Article article) {
-        return articleStorage.replace(articleId, article);
+        articleStorage.replace(articleId, article);
+        return findById(articleId);
     }
 
     public Article delete(Long articleId) {
         Article deleted = findById(articleId).delete();
-        return articleStorage.replace(articleId, deleted);
+        articleStorage.replace(articleId, deleted);
+        return findById(articleId);
     }
 
     public Article findById(Long articleId) {
