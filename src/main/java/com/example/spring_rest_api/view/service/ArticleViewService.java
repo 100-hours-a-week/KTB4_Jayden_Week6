@@ -27,8 +27,10 @@ public class ArticleViewService {
             articleViewCountMemoryRepository.increase(articleId);
         } else {
             if (findArticleView.getUpdatedAt().plusDays(1).compareTo(LocalDateTime.now()) < 0) {
-                articleViewMemoryRepository.update(findArticleView);
+                articleViewMemoryRepository.update(findArticleView.update());
                 articleViewCountMemoryRepository.increase(articleId);
+            } else {
+                return ArticleViewCountResponse.from(articleId, null);
             }
         }
 

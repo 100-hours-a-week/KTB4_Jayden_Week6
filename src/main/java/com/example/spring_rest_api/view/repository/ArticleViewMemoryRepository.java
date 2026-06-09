@@ -29,6 +29,6 @@ public class ArticleViewMemoryRepository {
     }
 
     public void update(ArticleView articleView) {
-        articleViewStorage.put(articleView.getArticleViewId(), articleView);
+        articleViewStorage.replace(articleView.getArticleViewId(), articleView);
     }
 }
