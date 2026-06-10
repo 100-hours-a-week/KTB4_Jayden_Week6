@@ -8,7 +8,10 @@ import com.example.spring_rest_api.article.service.request.ArticleCreateRequest;
 import com.example.spring_rest_api.article.service.request.ArticleUpdateRequest;
 import com.example.spring_rest_api.article.service.response.ArticleResponse;
 import com.example.spring_rest_api.common.exception.BadRequestException;
+import com.example.spring_rest_api.common.exception.ForbiddenException;
+import com.example.spring_rest_api.common.exception.NotFoundException;
 import com.example.spring_rest_api.common.exception.RequestConflictException;
+import com.example.spring_rest_api.user.repository.UserMemoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +23,12 @@ public class ArticleService {
     private final ArticleMemoryRepository articleMemoryRepository;
     private final ArticleTempMemoryRepository articleTempMemoryRepository;
     private final ArticleReportMemoryRepository articleReportMemoryRepository;
+    private final UserMemoryRepository userMemoryRepository;
     private Long sequence = 0L;
 
     public ArticleResponse create(ArticleCreateRequest request) {
+        throwIfUserNotFound(request);
+
         return ArticleResponse.from(articleMemoryRepository.save(Article.create(
                 sequence++,
                 request.getTitle(),
@@ -32,7 +38,20 @@ public class ArticleService {
         )));
     }
 
+    private void throwIfUserNotFound(ArticleCreateRequest request) {
+        if (userMemoryRepository.findById(request.getUserId()) == null) {
+            throw new NotFoundException("USER_NOT_FOUND");
+        }
+    }
+    private void throwIfUserNotFound(ArticleUpdateRequest request) {
+        if (userMemoryRepository.findById(request.getUserId()) == null) {
+            throw new NotFoundException("USER_NOT_FOUND");
+        }
+    }
+
     public ArticleResponse update(Long articleId, ArticleUpdateRequest request) {
+        throwIfNotAllowed(articleId, request);
+
         return ArticleResponse.from(articleMemoryRepository.update(
                         articleId,
                         articleMemoryRepository.findById(articleId).update(
@@ -43,7 +62,15 @@ public class ArticleService {
         ));
     }
 
+    private void throwIfNotAllowed(Long articleId, ArticleUpdateRequest request) {
+                if (!articleMemoryRepository.findById(articleId).getUserId().equals(request.getUserId())) {
+            throw new ForbiddenException("NOT_ALLOWED");
+        }
+    }
+
     public void saveTempArticle(Long userId, ArticleUpdateRequest request) {
+        throwIfUserNotFound(request);
+
         articleTempMemoryRepository.save(Article.create(
                 userId,
                 request.getTitle(),
