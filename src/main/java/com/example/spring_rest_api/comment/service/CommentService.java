@@ -25,7 +25,7 @@ public class CommentService {
     private Long sequence = 0L;
 
     public CommentResponse create(Long articleId, CommentCreateRequest request) {
-        throwIfArticleIsAbsent(articleId);
+        throwIfArticleNotFound(articleId);
 
         commentCountMemoryRepository.increase(articleId);
         return CommentResponse.from(commentMemoryRepository.save(Comment.create(
@@ -39,7 +39,7 @@ public class CommentService {
     }
 
     public CommentResponse update(Long articleId, Long commentId, CommentUpdateRequest request) {
-        throwIfArticleIsAbsent(articleId);
+        throwIfArticleNotFound(articleId);
 
         Comment updated = commentMemoryRepository.findById(commentId).update(request.getCommentText());
         return CommentResponse.from(
@@ -48,7 +48,7 @@ public class CommentService {
     }
 
     public CommentResponse delete(Long articleId, Long commentId) {
-        throwIfArticleIsAbsent(articleId);
+        throwIfArticleNotFound(articleId);
 
         Comment deleted = commentMemoryRepository.findById(commentId).delete();
         commentCountMemoryRepository.decrease(articleId);
@@ -58,7 +58,7 @@ public class CommentService {
     }
 
     public CommentResponse read(Long articleId, Long commentId) {
-        throwIfArticleIsAbsent(articleId);
+        throwIfArticleNotFound(articleId);
 
         return CommentResponse.from(
                 commentMemoryRepository.findById(commentId)
@@ -83,7 +83,7 @@ public class CommentService {
     }
 
 
-    private void throwIfArticleIsAbsent(Long articleId) {
+    private void throwIfArticleNotFound(Long articleId) {
         if (articleMemoryRepository.findById(articleId) == null) {
             throw new NotFoundException("ARTICLE_NOT_FOUND");
         }
