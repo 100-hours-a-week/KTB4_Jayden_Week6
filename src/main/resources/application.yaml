@@ -1,3 +1,25 @@
 spring:
   application:
     name: spring-rest-api
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # 스크립트 자동실행
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+      use-new-id-generator-mappings: false
+    show-sql: true
+    defer-datasource-initialization: true
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:~/test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
