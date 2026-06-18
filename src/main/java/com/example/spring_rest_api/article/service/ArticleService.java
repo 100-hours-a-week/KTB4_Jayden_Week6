@@ -8,10 +8,7 @@ import com.example.spring_rest_api.article.service.request.ArticleCreateRequest;
 import com.example.spring_rest_api.article.service.request.ArticleUpdateRequest;
 import com.example.spring_rest_api.article.service.response.ArticleResponse;
 import com.example.spring_rest_api.comment.repository.CommentCountMemoryRepository;
-import com.example.spring_rest_api.common.exception.BadRequestException;
-import com.example.spring_rest_api.common.exception.ForbiddenException;
-import com.example.spring_rest_api.common.exception.NotFoundException;
-import com.example.spring_rest_api.common.exception.RequestConflictException;
+import com.example.spring_rest_api.common.exception.*;
 import com.example.spring_rest_api.like.repository.ArticleLikeCountMemoryRepository;
 import com.example.spring_rest_api.user.repository.UserMemoryRepository;
 import com.example.spring_rest_api.view.repository.ArticleViewCountMemoryRepository;
@@ -34,6 +31,7 @@ public class ArticleService {
 
     public ArticleResponse create(ArticleCreateRequest request) {
         throwIfUserNotFound(request);
+        throwIfTooManyRequests(request);
 
         return ArticleResponse.from(articleMemoryRepository.save(Article.create(
                 sequence++,
@@ -49,9 +47,16 @@ public class ArticleService {
             throw new NotFoundException("USER_NOT_FOUND");
         }
     }
+
     private void throwIfUserNotFound(ArticleUpdateRequest request) {
         if (userMemoryRepository.findById(request.getUserId()) == null) {
             throw new NotFoundException("USER_NOT_FOUND");
+        }
+    }
+
+    private void throwIfTooManyRequests(ArticleCreateRequest request) {
+        if (articleMemoryRepository.countWithinOneMinute(request.getUserId()) >= 3) {
+            throw new TooManyRequestsException("1분 내 글 3개까지 작성할 수 있습니다.");
         }
     }
 

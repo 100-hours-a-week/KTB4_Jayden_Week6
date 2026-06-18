@@ -5,6 +5,7 @@ import com.example.spring_rest_api.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -60,5 +61,12 @@ public class ArticleMemoryRepository {
         if (replaced.getReportCount() >= 5) {
             replaced.hideArticle();
         }
+    }
+
+    public Long countWithinOneMinute(Long userId) {
+        return articleStorage.values().stream()
+                .filter(article -> article.getUserId().equals(userId))
+                .filter(article -> article.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(1L)))
+                .count();
     }
 }
