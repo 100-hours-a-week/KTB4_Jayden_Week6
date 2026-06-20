@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ArticleViewRepository extends JpaRepository<ArticleView, Long> {
 
-    Optional<ArticleView> findByArticleIdAndUserId(Long articleId, Long userId);
+    Optional<ArticleView> findByArticle_ArticleIdAndUser_UserId(Long articleId, Long userId);
 }

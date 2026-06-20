@@ -7,9 +7,9 @@ spring:
       path: /h2-console
 
   # 스크립트 자동실행
-  sql:
-    init:
-      mode: always
+#  sql:
+#    init:
+#      mode: always
 
   jpa:
     hibernate:

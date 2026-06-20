@@ -7,10 +7,10 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "article_views")
 @Getter
-@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArticleView {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

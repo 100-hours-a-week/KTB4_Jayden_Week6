@@ -1,21 +1,19 @@
 package com.example.spring_rest_api.article.entity;
 
-import com.example.spring_rest_api.article.entity.id.ArticleStatId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
-@Entity(name = "article_stats")
+@Entity
+@Table(name = "article_stats")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArticleStat {
-    @EmbeddedId
-    private ArticleStatId articleStatId;
+    @Id
+    private Long articleId;
 
-    @MapsId("articleId")
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     private Article article;
@@ -40,7 +38,9 @@ public class ArticleStat {
     }
 
     public void decreaseCommentCount() {
+        if (this.commentCount > 0) {
         this.commentCount--;
+        }
     }
 
     public void increaseArticleLikeCount() {
@@ -48,7 +48,9 @@ public class ArticleStat {
     }
 
     public void decreaseArticleLikeCount() {
-        this.articleLikeCount--;
+        if (this.articleLikeCount > 0) {
+            this.articleLikeCount--;
+        }
     }
 
     public void incrementArticleViewCount() {

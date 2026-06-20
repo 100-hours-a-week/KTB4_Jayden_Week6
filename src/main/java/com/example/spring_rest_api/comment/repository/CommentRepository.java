@@ -11,21 +11,21 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("""
-                select c.comment_id, c.user_id, c.comment_text, c.parent_comment_id, c.created_at, c.deleted_at, c.updated_at
-                    from comment c
-                    where c.article_id = :articleId
-                    order by c.parent_comment_id asc, c.comment_id asc
+                select c.commentId, c.user.userId, c.commentText, c.parentCommentId, c.createdAt, c.deletedAt, c.updatedAt
+                    from Comment c
+                    where c.article.articleId = :articleId
+                    order by c.parentCommentId asc, c.commentId asc
                     limit :pageSize
             """)
     List<Comment> findAllInfiniteScroll(Long articleId, Long pageSize);
 
     @Query("""
-                select c.comment_id, c.user_id, c.comment_text, c.parent_comment_id, c.created_at, c.deleted_at, c.updated_at
-                    from comment c
-                    where c.article_id = :articleId
-                        and (c.parent_comment_id > :lastParentCommentId or
-                            (c.parent_comment_id = :lastParentCommentId and c.comment_id > :lastCommentId))
-                    order by c.parent_comment_id asc, c.comment_id asc
+                select c.commentId, c.user.userId, c.commentText, c.parentCommentId, c.createdAt, c.deletedAt, c.updatedAt
+                    from Comment c
+                    where c.article.articleId = :articleId
+                        and (c.parentCommentId > :lastParentCommentId or
+                            (c.parentCommentId = :lastParentCommentId and c.commentId > :lastCommentId))
+                    order by c.parentCommentId asc, c.commentId asc
                     limit :pageSize
             """)
     List<Comment> findAllInfiniteScroll(Long articleId, Long pageSize, Long lastParentCommentId, Long lastCommentId);

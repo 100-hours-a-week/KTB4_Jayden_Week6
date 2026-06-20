@@ -2,13 +2,18 @@ package com.example.spring_rest_api.article.service;
 
 import com.example.spring_rest_api.article.entity.Article;
 import com.example.spring_rest_api.article.entity.ArticleStat;
+import com.example.spring_rest_api.article.entity.ArticleUpdateHistory;
 import com.example.spring_rest_api.article.repository.ArticleRepository;
 import com.example.spring_rest_api.article.repository.ArticleStatRepository;
+import com.example.spring_rest_api.article.repository.ArticleUpdateHistoryRepository;
 import com.example.spring_rest_api.article.service.request.ArticleCreateRequest;
 import com.example.spring_rest_api.article.service.request.ArticleUpdateRequest;
 import com.example.spring_rest_api.article.service.response.ArticleReadResponse;
 import com.example.spring_rest_api.article.service.response.ArticleResponse;
-import com.example.spring_rest_api.common.exception.*;
+import com.example.spring_rest_api.common.exception.BadRequestException;
+import com.example.spring_rest_api.common.exception.ForbiddenException;
+import com.example.spring_rest_api.common.exception.NotFoundException;
+import com.example.spring_rest_api.common.exception.TooManyRequestsException;
 import com.example.spring_rest_api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +29,7 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final ArticleStatRepository statRepository;
     private final UserRepository userRepository;
+    private final ArticleUpdateHistoryRepository historyRepository;
 
     @Transactional
     public ArticleResponse create(ArticleCreateRequest request) {
@@ -47,33 +53,41 @@ public class ArticleService {
 
     @Transactional
     public ArticleResponse update(Long articleId, ArticleUpdateRequest request) {
-        throwIfNotValidAccess(articleId, request);
+        throwIfAccessNotValid(articleId, request.getUserId());
 
         Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new NotFoundException("ARTICLE_NOT_FOUND"))
-                .update(
+                .orElseThrow(() -> new NotFoundException("ARTICLE_NOT_FOUND"));
+
+        historyRepository.save(ArticleUpdateHistory.create(
+                article,
+                article.getTitle(),
+                article.getContent(),
+                article.getContentImages()
+        ));
+
+        return ArticleResponse.from(
+                article.update(
                         request.getTitle(),
                         request.getContent(),
                         request.getContentImages()
-                );
-        //TODO - 수정 이력 저장 추가하기
-        return ArticleResponse.from(article);
+                )
+        );
     }
 
-    private void throwIfNotValidAccess(Long articleId, ArticleUpdateRequest request) {
+    private void throwIfAccessNotValid(Long articleId, Long userId) {
         Article article = articleRepository.findById(articleId).orElseThrow(() -> new NotFoundException("ARTICLE_NOT_FOUND"));
-        if (!request.getUserId().equals(article.getUser().getUserId())) {
+        if (!userId.equals(article.getUser().getUserId())) {
             throw new ForbiddenException("ACCESS_NOT_VALID");
         }
     }
 
     @Transactional
     public ArticleResponse delete(Long articleId) {
-        //TODO - 사용자 인가 validation 넣기
-        Article deleted = articleRepository.findById(articleId)
-                .orElseThrow(() -> new NotFoundException("ARTICLE_NOT_FOUND"))
-                .delete();
-        return ArticleResponse.from(deleted);
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new NotFoundException("ARTICLE_NOT_FOUND"));
+        throwIfAccessNotValid(articleId, article.getUser().getUserId());
+
+        return ArticleResponse.from(article.delete());
     }
 
     public ArticleReadResponse read(Long articleId) {
@@ -92,13 +106,13 @@ public class ArticleService {
         }
     }
 
-    public List<ArticleReadResponse> readInfiniteScroll(Long pageSize, Long lastArticleId) {
+    public List<ArticleResponse> readInfiniteScroll(Long pageSize, Long lastArticleId) {
         List<Article> articles = lastArticleId == null ?
                 articleRepository.findAllInfiniteScroll(pageSize) :
                 articleRepository.findAllInfiniteScroll(pageSize, lastArticleId);
-        //TODO - 게시글 무한스크롤 수정하기
+
         return articles.stream()
-                .map(ArticleReadResponse::from)
+                .map(ArticleResponse::from)
                 .toList();
     }
 }

@@ -5,15 +5,14 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity(name = "articles")
+@Entity
+@Table(name = "articles")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -30,6 +29,9 @@ public class Article {
     private LocalDateTime deletedAt;
     private boolean isArticleHidden;
 
+    @OneToOne(mappedBy = "article", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private ArticleStat articleStat;
+
     public static Article create(User user, String title, String content, List<String> contentImages) {
         Article article = new Article();
         article.user = user;
@@ -39,6 +41,9 @@ public class Article {
         article.createdAt = LocalDateTime.now();
         article.deletedAt = null;
         article.isArticleHidden = false;
+
+        article.articleStat = ArticleStat.create(article);
+
         return article;
     }
 

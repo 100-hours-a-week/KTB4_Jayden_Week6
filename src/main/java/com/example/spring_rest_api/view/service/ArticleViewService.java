@@ -25,7 +25,7 @@ public class ArticleViewService {
 
     @Transactional
     public ArticleViewCountResponse increaseCount(Long articleId, Long userId) {
-        ArticleView articleView = articleViewRepository.findByArticleIdAndUserId(articleId, userId)
+        ArticleView articleView = articleViewRepository.findByArticle_ArticleIdAndUser_UserId(articleId, userId)
                 .orElse(null);
         ArticleStat stat = articleStatRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException("ARTICLE_STAT_NOT_FOUND"));

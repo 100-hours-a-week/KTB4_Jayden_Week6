@@ -9,6 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ArticleLikeRepository extends JpaRepository<ArticleLike, Long> {
 
-    Optional<ArticleLike> findByArticleIdAndUserId(Long articleId, Long userId);
-
+    Optional<ArticleLike> findByArticle_ArticleIdAndUser_UserId(Long articleId, Long userId);
 }

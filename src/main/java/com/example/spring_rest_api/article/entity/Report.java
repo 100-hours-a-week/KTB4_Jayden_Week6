@@ -5,14 +5,13 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "article_reports")
+@Entity
+@Table(name = "article_reports")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

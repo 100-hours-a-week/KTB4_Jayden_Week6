@@ -24,7 +24,7 @@ public class ArticleLikeService {
 
     @Transactional
     public ArticleLikeCountResponse like(Long articleId, Long userId) {
-        if (articleLikeRepository.findByArticleIdAndUserId(articleId, userId).isPresent()) {
+        if (articleLikeRepository.findByArticle_ArticleIdAndUser_UserId(articleId, userId).isPresent()) {
             throw new BadRequestException("ALREADY_LIKED");
         }
 
@@ -46,7 +46,7 @@ public class ArticleLikeService {
     @Transactional
     public ArticleLikeCountResponse unlike(Long articleId, Long userId) {
         ArticleLike like = articleLikeRepository
-                .findByArticleIdAndUserId(articleId, userId)
+                .findByArticle_ArticleIdAndUser_UserId(articleId, userId)
                 .orElseThrow(() -> new NotFoundException("LIKE_NOT_FOUND"));
         articleLikeRepository.delete(like);
 

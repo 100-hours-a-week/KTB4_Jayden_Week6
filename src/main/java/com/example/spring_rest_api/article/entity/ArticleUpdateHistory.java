@@ -4,15 +4,14 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity(name = "article_update_history")
+@Entity
+@Table(name = "article_update_history")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArticleUpdateHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

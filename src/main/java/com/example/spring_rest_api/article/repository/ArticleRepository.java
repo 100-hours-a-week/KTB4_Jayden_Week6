@@ -12,7 +12,8 @@ import java.util.List;
 public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     @Query("""
-                select a.articleId, a.user, a.title, a.content, a.contentImages, a.createdAt
+                select a.articleId, a.user.userId, a.title, a.content, a.contentImages, a.createdAt,
+                        a.articleStat.commentCount, a.articleStat.articleLikeCount, a.articleStat.articleViewCount
                     from Article a
                     where a.deletedAt is null and a.isArticleHidden is false
                     order by a.articleId desc
@@ -21,7 +22,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     List<Article> findAllInfiniteScroll(Long pageSize);
 
     @Query("""
-                select a.articleId, a.user, a.title, a.content, a.contentImages, a.createdAt
+                select a.articleId, a.user.userId, a.title, a.content, a.contentImages, a.createdAt,
+                        a.articleStat.commentCount, a.articleStat.articleLikeCount, a.articleStat.articleViewCount
                     from Article a
                     where a.articleId < :lastArticleId and a.deletedAt is null and a.isArticleHidden is false
                     order by a.articleId desc
@@ -30,10 +32,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     List<Article> findAllInfiniteScroll(Long pageSize, Long lastArticleId);
 
     @Query("""
-                select count(a.articleId)
+                select count(a)
                     from Article a
-                    where a.user.getUserId = :userId and a.createdAt >= :localDateTimeMinusMinuteOne
-                    order by a.articleId desc
+                    where a.user.userId = :userId and a.createdAt >= :localDateTimeMinusMinuteOne
             """)
     int countWithinOneMinute(Long userId, LocalDateTime localDateTimeMinusMinuteOne);
 }

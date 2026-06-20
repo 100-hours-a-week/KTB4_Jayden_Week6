@@ -23,7 +23,7 @@ public class ArticleReportService {
 
     @Transactional
     public void report(Long articleId, Long reportingUserId, ArticleReportRequest request) {
-        if (reportRepository.findByArticleIdAndUserId(articleId, reportingUserId).isPresent()) {
+        if (reportRepository.findByArticle_ArticleIdAndUser_UserId(articleId, reportingUserId).isPresent()) {
             throw new BadRequestException("ALREADY_REPORTED");
         }
         ArticleStat stat = articleStatRepository.findById(articleId).orElseThrow(() -> new NotFoundException("ARTICLE_STAT_NOT_FOUND"));

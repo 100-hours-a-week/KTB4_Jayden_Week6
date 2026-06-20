@@ -1,25 +1,23 @@
 package com.example.spring_rest_api.article.entity;
 
-import com.example.spring_rest_api.article.entity.id.TempArticleId;
 import com.example.spring_rest_api.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@Table(name = "temp_articles")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class TempArticle {
-    @EmbeddedId
-    private TempArticleId tempArticleId;
+    @Id
+    private Long userId;
 
-    @MapsId("userId")
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

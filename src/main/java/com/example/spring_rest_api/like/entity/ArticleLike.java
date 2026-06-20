@@ -7,10 +7,10 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "article_likes")
 @Getter
-@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArticleLike {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
