@@ -30,10 +30,9 @@ public class ArticleViewService {
         ArticleStat stat = articleStatRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException("ARTICLE_STAT_NOT_FOUND"));
 
-        if (articleView == null) {
-            return getViewCountIfNotSaved(articleId, userId, stat);
-        }
-        return getViewCountIfSaved(articleId, articleView, stat);
+        return articleView == null ?
+                getViewCountIfNotSaved(articleId, userId, stat) :
+                getViewCountIfSaved(articleId, articleView, stat);
     }
 
     private ArticleViewCountResponse getViewCountIfNotSaved(Long articleId, Long userId, ArticleStat stat) {
