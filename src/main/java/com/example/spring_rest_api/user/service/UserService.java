@@ -5,7 +5,8 @@ import com.example.spring_rest_api.common.exception.RequestConflictException;
 import com.example.spring_rest_api.user.entity.User;
 import com.example.spring_rest_api.user.repository.UserRepository;
 import com.example.spring_rest_api.user.service.request.UserCreateRequest;
-import com.example.spring_rest_api.user.service.request.UserUpdateRequest;
+import com.example.spring_rest_api.user.service.request.UserUpdateInfoRequest;
+import com.example.spring_rest_api.user.service.request.UserUpdatePasswordRequest;
 import com.example.spring_rest_api.user.service.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updateInformation(Long userId, UserUpdateRequest request) {
+    public UserResponse updateInformation(Long userId, UserUpdateInfoRequest request) {
         if (userRepository.findByNickname(request.getNickname()).isPresent()) {
             throw new RequestConflictException("이미 존재하는 닉네임입니다.");
         }
@@ -56,7 +57,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updatePassword(Long userId, UserUpdateRequest request) {
+    public UserResponse updatePassword(Long userId, UserUpdatePasswordRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND"));
         return UserResponse.from(user.updatePassword(
@@ -68,7 +69,7 @@ public class UserService {
     public UserResponse delete(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND"));
-        userRepository.delete(user);
+        user.delete();
         return UserResponse.from(user);
     }
 }

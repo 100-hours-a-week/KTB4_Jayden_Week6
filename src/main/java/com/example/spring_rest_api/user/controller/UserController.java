@@ -3,7 +3,8 @@ package com.example.spring_rest_api.user.controller;
 import com.example.spring_rest_api.common.response.ApiResponse;
 import com.example.spring_rest_api.user.service.UserService;
 import com.example.spring_rest_api.user.service.request.UserCreateRequest;
-import com.example.spring_rest_api.user.service.request.UserUpdateRequest;
+import com.example.spring_rest_api.user.service.request.UserUpdateInfoRequest;
+import com.example.spring_rest_api.user.service.request.UserUpdatePasswordRequest;
 import com.example.spring_rest_api.user.service.response.UserResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class UserController {
     }
 
     @PatchMapping("/users/{userId}")
-    public ResponseEntity<ApiResponse<UserResponse>> updateInformation(@PathVariable Long userId, @Valid @RequestBody UserUpdateRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> updateInformation(@PathVariable Long userId, @Valid @RequestBody UserUpdateInfoRequest request) {
         return ResponseEntity.ok(ApiResponse.of(
                 "user_info_update_success",
                 userService.updateInformation(userId, request)
@@ -42,7 +43,7 @@ public class UserController {
     }
 
     @PatchMapping("/users/{userId}/password")
-    public ResponseEntity<ApiResponse<UserResponse>> updatePassword(@PathVariable Long userId, @Valid @RequestBody UserUpdateRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> updatePassword(@PathVariable Long userId, @Valid @RequestBody UserUpdatePasswordRequest request) {
         return ResponseEntity.ok(ApiResponse.of(
                 "user_password_update_success",
                 userService.updatePassword(userId, request)
