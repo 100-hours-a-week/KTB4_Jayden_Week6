@@ -9,6 +9,7 @@ import com.example.spring_rest_api.comment.service.request.CommentCreateRequest;
 import com.example.spring_rest_api.comment.service.request.CommentUpdateRequest;
 import com.example.spring_rest_api.comment.service.response.CommentCountResponse;
 import com.example.spring_rest_api.comment.service.response.CommentResponse;
+import com.example.spring_rest_api.common.exception.BadRequestException;
 import com.example.spring_rest_api.common.exception.NotFoundException;
 import com.example.spring_rest_api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,16 +29,17 @@ public class CommentService {
 
     @Transactional
     public CommentResponse create(Long articleId, CommentCreateRequest request) {
-        ArticleStat stat = articleStatRepository.findById(articleId).orElseThrow(() -> new NotFoundException("ARTICLE_STAT_NOT_FOUND"));
-        stat.increaseCommentCount();
-
         Comment comment = Comment.create(
                 articleRepository.findById(articleId).orElseThrow(() -> new NotFoundException("ARTICLE_NOT_FOUND")),
                 userRepository.findById(request.getUserId()).orElseThrow(() -> new NotFoundException("USER_NOT_FOUND")),
                 request.getParentCommentId() == null ? null : request.getParentCommentId(),
                 request.getCommentText()
         );
-        return CommentResponse.from(comment);
+
+        ArticleStat stat = articleStatRepository.findById(articleId).orElseThrow(() -> new NotFoundException("ARTICLE_STAT_NOT_FOUND"));
+        stat.increaseCommentCount();
+
+        return CommentResponse.from(commentRepository.save(comment));
     }
 
     @Transactional
@@ -65,16 +67,18 @@ public class CommentService {
     public CommentResponse read(Long articleId, Long commentId) {
         articleStatRepository.findById(articleId).orElseThrow(() -> new NotFoundException("ARTICLE_STAT_NOT_FOUND"));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("COMMENT_NOT_FOUND"));
+        if (comment.getDeletedAt() != null) {
+            throw new BadRequestException("COMMENT_ALREADY_DELETED");
+        }
 
         return CommentResponse.from(comment);
     }
 
     public List<CommentResponse> readAllInfiniteScroll(Long articleId, Long pageSize, Long lastParentCommentId, Long lastCommentId) {
-        List<Comment> comments = lastCommentId == null && lastParentCommentId == null ?
+        List<CommentResponse> comments = lastCommentId == null || lastParentCommentId == null ?
                 commentRepository.findAllInfiniteScroll(articleId, pageSize) :
                 commentRepository.findAllInfiniteScroll(articleId, pageSize, lastParentCommentId, lastCommentId);
         return comments.stream()
-                .map(CommentResponse::from)
                 .toList();
     }
 

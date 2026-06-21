@@ -30,4 +30,15 @@ public class CommentResponse {
         response.parentCommentId = comment.getParentCommentId();
         return response;
     }
+
+    public CommentResponse(Long commentId, Long userId, String profileImage, String commentText, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt, Long parentCommentId) {
+        this.commentId = commentId;
+        this.userId = userId;
+        this.profileImage = profileImage;
+        this.commentText = commentText;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.deletedAt = deletedAt;
+        this.parentCommentId = parentCommentId;
+    }
 }

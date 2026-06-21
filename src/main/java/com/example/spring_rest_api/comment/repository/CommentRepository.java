@@ -1,6 +1,7 @@
 package com.example.spring_rest_api.comment.repository;
 
 import com.example.spring_rest_api.comment.entity.Comment;
+import com.example.spring_rest_api.comment.service.response.CommentResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,16 +12,16 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("""
-                select c.commentId, c.user.userId, c.commentText, c.parentCommentId, c.createdAt, c.deletedAt, c.updatedAt
+                select new com.example.spring_rest_api.comment.service.response.CommentResponse(c.commentId, c.user.userId, c.user.profileImage, c.commentText, c.createdAt, c.updatedAt, c.deletedAt, c.parentCommentId)
                     from Comment c
                     where c.article.articleId = :articleId
                     order by c.parentCommentId asc, c.commentId asc
                     limit :pageSize
             """)
-    List<Comment> findAllInfiniteScroll(Long articleId, Long pageSize);
+    List<CommentResponse> findAllInfiniteScroll(Long articleId, Long pageSize);
 
     @Query("""
-                select c.commentId, c.user.userId, c.commentText, c.parentCommentId, c.createdAt, c.deletedAt, c.updatedAt
+                select new com.example.spring_rest_api.comment.service.response.CommentResponse(c.commentId, c.user.userId, c.user.profileImage, c.commentText, c.createdAt, c.updatedAt, c.deletedAt, c.parentCommentId)
                     from Comment c
                     where c.article.articleId = :articleId
                         and (c.parentCommentId > :lastParentCommentId or
@@ -28,5 +29,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                     order by c.parentCommentId asc, c.commentId asc
                     limit :pageSize
             """)
-    List<Comment> findAllInfiniteScroll(Long articleId, Long pageSize, Long lastParentCommentId, Long lastCommentId);
+    List<CommentResponse> findAllInfiniteScroll(Long articleId, Long pageSize, Long lastParentCommentId, Long lastCommentId);
 }

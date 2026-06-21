@@ -48,7 +48,7 @@ public class Comment {
     }
 
     public Comment delete() {
-        this.updatedAt = LocalDateTime.now();
+        this.deletedAt = LocalDateTime.now();
         return this;
     }
 }
