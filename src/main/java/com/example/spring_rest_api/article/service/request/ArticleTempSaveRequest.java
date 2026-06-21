@@ -16,7 +16,5 @@ public class ArticleTempSaveRequest {
     private String title;
     @NotNull
     private String content;
-    @NotNull
-    private Long userId;
     private List<String> contentImages;
 }
