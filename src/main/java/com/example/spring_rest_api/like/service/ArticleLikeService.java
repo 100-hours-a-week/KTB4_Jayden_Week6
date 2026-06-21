@@ -28,10 +28,10 @@ public class ArticleLikeService {
             throw new BadRequestException("ALREADY_LIKED");
         }
 
-        ArticleLike.create(
+        articleLikeRepository.save(ArticleLike.create(
                 articleRepository.findById(articleId).orElseThrow(() -> new NotFoundException("ARTICLE_NOT_FOUND")),
                 userRepository.findById(userId).orElseThrow(() -> new NotFoundException("USER_NOT_FOUND"))
-        );
+        ));
 
         ArticleStat stat = articleStatRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException("ARTICLE_STAT_NOT_FOUND"));
