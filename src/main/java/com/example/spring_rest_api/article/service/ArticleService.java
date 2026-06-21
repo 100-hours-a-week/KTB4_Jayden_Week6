@@ -46,7 +46,7 @@ public class ArticleService {
     }
 
     private void throwIfTooManyRequests(ArticleCreateRequest request) {
-        if (articleRepository.countWithinOneMinute(request.getUserId(), LocalDateTime.now().minusDays(1)) >= 3) {
+        if (articleRepository.countWithinOneMinute(request.getUserId(), LocalDateTime.now().minusMinutes(1)) >= 3) {
             throw new TooManyRequestsException("1분 내 글 3개까지 작성할 수 있습니다.");
         }
     }
@@ -76,7 +76,7 @@ public class ArticleService {
 
     private void throwIfAccessNotValid(Long articleId, Long userId) {
         Article article = articleRepository.findById(articleId).orElseThrow(() -> new NotFoundException("ARTICLE_NOT_FOUND"));
-        if (!userId.equals(article.getUser().getUserId())) {
+        if (!userId.equals(article.getUser().getUserId()) && userRepository.findById(userId).orElseThrow(() -> new NotFoundException("USER_NOT_FOUND")).getDeletedAt() != null) {
             throw new ForbiddenException("ACCESS_NOT_VALID");
         }
     }
@@ -106,13 +106,12 @@ public class ArticleService {
         }
     }
 
-    public List<ArticleResponse> readInfiniteScroll(Long pageSize, Long lastArticleId) {
-        List<Article> articles = lastArticleId == null ?
+    public List<ArticleReadResponse> readInfiniteScroll(Long pageSize, Long lastArticleId) {
+        List<ArticleReadResponse> articles = lastArticleId == null ?
                 articleRepository.findAllInfiniteScroll(pageSize) :
                 articleRepository.findAllInfiniteScroll(pageSize, lastArticleId);
 
         return articles.stream()
-                .map(ArticleResponse::from)
                 .toList();
     }
 }

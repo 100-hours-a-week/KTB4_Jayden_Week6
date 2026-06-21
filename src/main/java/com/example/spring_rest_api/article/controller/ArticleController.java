@@ -53,7 +53,7 @@ public class ArticleController {
     }
 
     @GetMapping("/articles")
-    public ResponseEntity<ApiResponse<List<ArticleResponse>>> readInfiniteScroll(
+    public ResponseEntity<ApiResponse<List<ArticleReadResponse>>> readInfiniteScroll(
             @RequestParam("pageSize") Long pageSize,
             @RequestParam(value = "lastArticleId", required = false) Long lastArticleId
     ) {

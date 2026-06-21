@@ -36,4 +36,18 @@ public class ArticleReadResponse {
         response.articleViewCount = articleStat.getArticleViewCount();
         return response;
     }
+
+    //무한스크롤 쿼리용
+    public ArticleReadResponse(Long articleId, Long userId, String title, String content, List<String> contentImages, LocalDateTime createdAt, LocalDateTime updatedAt, Long commentCount, Long articleLikeCount, Long articleViewCount) {
+        this.articleId = articleId;
+        this.userId = userId;
+        this.title = title;
+        this.content = content;
+        this.contentImages = contentImages;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.commentCount = commentCount;
+        this.articleLikeCount = articleLikeCount;
+        this.articleViewCount = articleViewCount;
+    }
 }
