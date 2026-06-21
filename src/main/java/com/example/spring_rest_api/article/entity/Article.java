@@ -5,8 +5,11 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,7 +27,9 @@ public class Article {
 
     private String title;
     private String content;
-    private List<String> contentImages;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "JSON")
+    private List<String> contentImages = new ArrayList<>();
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
@@ -38,7 +43,7 @@ public class Article {
         article.user = user;
         article.title = title;
         article.content = content;
-        article.contentImages = contentImages;
+        article.contentImages = contentImages == null ? new ArrayList<>() : new ArrayList<>(contentImages);
         article.createdAt = LocalDateTime.now();
         article.updatedAt = null;
         article.deletedAt = null;
@@ -52,7 +57,7 @@ public class Article {
     public Article update(String title, String content, List<String> contentImages) {
         this.title = title;
         this.content = content;
-        this.contentImages = contentImages;
+        this.contentImages = contentImages == null ? new ArrayList<>() : contentImages;
         this.updatedAt = LocalDateTime.now();
         return this;
     }
