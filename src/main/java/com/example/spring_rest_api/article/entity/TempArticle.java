@@ -41,4 +41,12 @@ public class TempArticle {
         article.savedAt = LocalDateTime.now();
         return article;
     }
+
+    public TempArticle update(String title, String content, List<String> contentImages) {
+        this.title = title;
+        this.content = content;
+        this.contentImages = contentImages == null ? new ArrayList<>() : new ArrayList<>(contentImages);
+        this.savedAt = LocalDateTime.now();
+        return this;
+    }
 }

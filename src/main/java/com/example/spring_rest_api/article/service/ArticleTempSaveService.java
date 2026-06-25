@@ -19,12 +19,22 @@ public class ArticleTempSaveService {
 
     @Transactional
     public void saveTempArticle(Long userId, ArticleTempSaveRequest request) {
-        tempSaveRepository.save(TempArticle.create(
-                userRepository.findById(userId).orElseThrow(() -> new NotFoundException("USER_NOT_FOUND")),
-                request.getTitle(),
-                request.getContent(),
-                request.getContentImages()
-        ));
+        TempArticle tempArticle = tempSaveRepository.findByUserId(userId).orElse(null);
+        if (tempArticle == null) {
+            tempSaveRepository.save(TempArticle.create(
+                    userRepository.findById(userId).orElseThrow(() -> new NotFoundException("USER_NOT_FOUND")),
+                    request.getTitle(),
+                    request.getContent(),
+                    request.getContentImages()
+            ));
+        } else {
+            tempArticle.update(
+                    request.getTitle(),
+                    request.getContent(),
+                    request.getContentImages()
+            );
+        }
+
     }
 
     public ArticleTempSaveResponse readTempArticle(Long userId) {
