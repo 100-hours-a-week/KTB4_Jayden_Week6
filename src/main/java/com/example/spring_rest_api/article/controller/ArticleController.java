@@ -2,6 +2,7 @@ package com.example.spring_rest_api.article.controller;
 
 import com.example.spring_rest_api.article.service.ArticleService;
 import com.example.spring_rest_api.article.service.request.ArticleCreateRequest;
+import com.example.spring_rest_api.article.service.request.ArticleDeleteRequest;
 import com.example.spring_rest_api.article.service.request.ArticleUpdateRequest;
 import com.example.spring_rest_api.article.service.response.ArticleReadResponse;
 import com.example.spring_rest_api.article.service.response.ArticleResponse;
@@ -37,10 +38,10 @@ public class ArticleController {
     }
 
     @DeleteMapping("/articles/{articleId}")
-    public ResponseEntity<ApiResponse<ArticleResponse>> delete(@PathVariable Long articleId) {
+    public ResponseEntity<ApiResponse<ArticleResponse>> delete(@PathVariable Long articleId,  @Valid @RequestBody ArticleDeleteRequest request) {
         return ResponseEntity.ok(ApiResponse.of(
                 "article_delete_success",
-                articleService.delete(articleId)
+                articleService.delete(articleId, request)
         ));
     }
 

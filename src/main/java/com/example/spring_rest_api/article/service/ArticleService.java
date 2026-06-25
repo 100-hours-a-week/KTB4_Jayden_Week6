@@ -7,6 +7,7 @@ import com.example.spring_rest_api.article.repository.ArticleRepository;
 import com.example.spring_rest_api.article.repository.ArticleStatRepository;
 import com.example.spring_rest_api.article.repository.ArticleUpdateHistoryRepository;
 import com.example.spring_rest_api.article.service.request.ArticleCreateRequest;
+import com.example.spring_rest_api.article.service.request.ArticleDeleteRequest;
 import com.example.spring_rest_api.article.service.request.ArticleUpdateRequest;
 import com.example.spring_rest_api.article.service.response.ArticleReadResponse;
 import com.example.spring_rest_api.article.service.response.ArticleResponse;
@@ -76,16 +77,16 @@ public class ArticleService {
 
     private void throwIfAccessNotValid(Long articleId, Long userId) {
         Article article = articleRepository.findById(articleId).orElseThrow(() -> new NotFoundException("ARTICLE_NOT_FOUND"));
-        if (!userId.equals(article.getUser().getUserId()) || userRepository.findById(userId).orElseThrow(() -> new NotFoundException("USER_NOT_FOUND")).getDeletedAt() != null) {
+        if (!userId.equals(article.getUser().getUserId()) || article.getUser().getDeletedAt() != null) {
             throw new ForbiddenException("ACCESS_NOT_VALID");
         }
     }
 
     @Transactional
-    public ArticleResponse delete(Long articleId) {
+    public ArticleResponse delete(Long articleId, ArticleDeleteRequest request) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new NotFoundException("ARTICLE_NOT_FOUND"));
-        throwIfAccessNotValid(articleId, article.getUser().getUserId());
+        throwIfAccessNotValid(articleId, request.getUserId());
 
         return ArticleResponse.from(article.delete());
     }
