@@ -44,12 +44,15 @@ public class UserService {
 
     @Transactional
     public UserResponse updateInformation(Long userId, UserUpdateInfoRequest request) {
-        if (userRepository.findByNickname(request.getNickname()).isPresent()) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND"));
+        User userByNickname = userRepository.findByNickname(request.getNickname())
+                .orElse(null);
+
+        if (userByNickname != null && !userByNickname.getUserId().equals(userId)) {
             throw new RequestConflictException("이미 존재하는 닉네임입니다.");
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND"));
         return UserResponse.from(user.updateInformation(
                 request.getNickname(),
                 request.getProfileImage()
