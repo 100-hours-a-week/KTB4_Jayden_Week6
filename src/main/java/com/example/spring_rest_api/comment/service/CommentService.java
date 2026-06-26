@@ -33,7 +33,7 @@ public class CommentService {
         Comment comment = Comment.create(
                 articleRepository.findById(articleId).orElseThrow(() -> new NotFoundException("ARTICLE_NOT_FOUND")),
                 userRepository.findById(request.getUserId()).orElseThrow(() -> new NotFoundException("USER_NOT_FOUND")),
-                request.getParentCommentId() == null ? null : request.getParentCommentId(),
+                request.getParentCommentId() == null ? null : commentRepository.findById(request.getParentCommentId()).orElseThrow(() -> new NotFoundException("PARENT_COMMENT_NOT_FOUND")),
                 request.getCommentText()
         );
 
@@ -74,15 +74,10 @@ public class CommentService {
         );
     }
 
-    private void throwIfNotInArticle(Long articleId, Comment comment) {
-        if (!comment.getArticle().getArticleId().equals(articleId)) {
-            throw new BadRequestException("다른 게시글의 댓글입니다.");
-        }
-    }
-
     public CommentResponse read(Long articleId, Long commentId) {
-        articleStatRepository.findById(articleId).orElseThrow(() -> new NotFoundException("ARTICLE_STAT_NOT_FOUND"));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new NotFoundException("COMMENT_NOT_FOUND"));
+        throwIfNotInArticle(articleId, comment);
+        articleStatRepository.findById(articleId).orElseThrow(() -> new NotFoundException("ARTICLE_STAT_NOT_FOUND"));
         if (comment.getDeletedAt() != null) {
             throw new BadRequestException("COMMENT_ALREADY_DELETED");
         }
@@ -90,11 +85,18 @@ public class CommentService {
         return CommentResponse.from(comment);
     }
 
-    public List<CommentResponse> readAllInfiniteScroll(Long articleId, Long pageSize, Long lastParentCommentId, Long lastCommentId) {
-        return lastCommentId == null || lastParentCommentId == null ?
-                commentRepository.findAllInfiniteScroll(articleId, pageSize) :
-                commentRepository.findAllInfiniteScroll(articleId, pageSize, lastParentCommentId, lastCommentId);
+    private void throwIfNotInArticle(Long articleId, Comment comment) {
+        if (!comment.getArticle().getArticleId().equals(articleId)) {
+            throw new BadRequestException("다른 게시글의 댓글입니다.");
+        }
+    }
 
+    public List<CommentResponse> readAllInfiniteScroll(Long articleId, Long pageSize, Long lastParentCommentId, Long lastCommentId) {
+        return lastCommentId == null && lastParentCommentId == null ?
+        commentRepository.findAllInfiniteScroll(articleId, pageSize) :
+        lastParentCommentId == null ?
+                commentRepository.findAllInfiniteScroll(articleId, pageSize, lastCommentId) :
+                commentRepository.findAllInfiniteScroll(articleId, pageSize, lastParentCommentId, lastCommentId);
     }
 
     public CommentCountResponse readCount(Long articleId) {

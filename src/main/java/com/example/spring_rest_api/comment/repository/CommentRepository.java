@@ -12,36 +12,116 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("""
-                select new com.example.spring_rest_api.comment.service.response.CommentResponse(c.commentId, c.user.userId, c.user.profileImage, c.commentText, c.createdAt, c.updatedAt, c.deletedAt, c.parentCommentId)
-                    from Comment c
-                    left join Comment cp
-                        on c.commentId = cp.parentCommentId
-                    where c.article.articleId = :articleId
-                        and (
-                            c.deletedAt is null
-                            or (c.deletedAt is not null and cp.commentId is not null and cp.deletedAt is null)
+            select new com.example.spring_rest_api.comment.service.response.CommentResponse(
+                c.commentId,
+                u.userId,
+                u.profileImage,
+                c.commentText,
+                c.createdAt,
+                c.updatedAt,
+                c.deletedAt,
+                p.commentId
+            )
+            from Comment c
+            left join c.user u
+            left join c.parentComment p
+            where
+                c.article.articleId = :articleId
+                and (
+                    c.deletedAt is null
+                    or (
+                        c.parentComment is null
+                        and exists (
+                            select 1
+                            from Comment child
+                            where child.parentComment.commentId = c.commentId
+                                and child.deletedAt is null
                         )
-                    order by c.parentCommentId asc, c.commentId asc
-                    limit :pageSize
+                    )
+                )
+            order by coalesce(p.commentId, c.commentId) asc,
+                case when c.parentComment is null then 0 else 1 end asc,
+                c.commentId asc
+            limit :pageSize
             """)
     List<CommentResponse> findAllInfiniteScroll(Long articleId, Long pageSize);
 
+
+
     @Query("""
-                select new com.example.spring_rest_api.comment.service.response.CommentResponse(c.commentId, c.user.userId, c.user.profileImage, c.commentText, c.createdAt, c.updatedAt, c.deletedAt, c.parentCommentId)
-                    from Comment c
-                    left join Comment cp
-                        on c.commentId = cp.parentCommentId
-                    where c.article.articleId = :articleId
-                        and (
-                            c.deletedAt is null
-                            or (c.deletedAt is not null and cp.commentId is not null and cp.deletedAt is null)
+            select new com.example.spring_rest_api.comment.service.response.CommentResponse(
+                c.commentId,
+                u.userId,
+                u.profileImage,
+                c.commentText,
+                c.createdAt,
+                c.updatedAt,
+                c.deletedAt,
+                p.commentId
+            )
+            from Comment c
+            left join c.user u
+            left join c.parentComment p
+            where
+                c.article.articleId = :articleId
+                and ((c.commentId > :lastCommentId and p.commentId is null)
+                    or (c.commentId > :lastCommentId and p.commentId >= :lastCommentId))
+                and (
+                    c.deletedAt is null
+                    or (
+                        c.parentComment is null
+                        and exists (
+                            select 1
+                            from Comment child
+                            where child.parentComment.commentId = c.commentId
+                                and child.deletedAt is null
                         )
-                        and (
-                            c.parentCommentId > :lastParentCommentId or
-                            (c.parentCommentId = :lastParentCommentId and c.commentId > :lastCommentId)
+                    )
+                )
+            order by coalesce(p.commentId, c.commentId) asc,
+                case when c.parentComment is null then 0 else 1 end asc,
+                c.commentId asc
+            limit :pageSize
+            """)
+    List<CommentResponse> findAllInfiniteScroll(Long articleId, Long pageSize, Long lastCommentId);
+
+    @Query("""
+            select new com.example.spring_rest_api.comment.service.response.CommentResponse(
+                c.commentId,
+                u.userId,
+                u.profileImage,
+                c.commentText,
+                c.createdAt,
+                c.updatedAt,
+                c.deletedAt,
+                p.commentId
+            )
+            from Comment c
+            left join c.user u
+            left join c.parentComment p
+            where
+                c.article.articleId = :articleId
+                and (
+                    (c.parentComment is null and c.commentId > :lastParentCommentId)
+                    or (p.commentId = :lastParentCommentId and c.commentId > :lastCommentId)
+                    or p.commentId > :lastParentCommentId
+                )
+                and (
+                    c.deletedAt is null
+                    or (
+                        c.parentComment is null
+                        and exists (
+                            select 1
+                            from Comment child
+                            where child.parentComment.commentId = c.commentId
+                                and child.deletedAt is null
                         )
-                    order by c.parentCommentId asc, c.commentId asc
-                    limit :pageSize
+                    )
+                )
+            order by coalesce(p.commentId, c.commentId) asc,
+                case when c.parentComment is null then 0 else 1 end asc,
+                c.commentId asc
+            limit :pageSize
             """)
     List<CommentResponse> findAllInfiniteScroll(Long articleId, Long pageSize, Long lastParentCommentId, Long lastCommentId);
 }

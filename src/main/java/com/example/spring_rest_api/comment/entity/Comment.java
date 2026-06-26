@@ -23,17 +23,19 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    private Long parentCommentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
     private String commentText;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
 
-    public static Comment create(Article article, User user, Long parentCommentId, String commentText) {
+    public static Comment create(Article article, User user, Comment parentComment, String commentText) {
         Comment comment = new  Comment();
         comment.article = article;
         comment.user = user;
-        comment.parentCommentId = parentCommentId;
+        comment.parentComment = parentComment;
         comment.commentText = commentText;
         comment.createdAt = LocalDateTime.now();
         comment.updatedAt = null;

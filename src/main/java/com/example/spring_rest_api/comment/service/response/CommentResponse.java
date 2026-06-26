@@ -27,7 +27,7 @@ public class CommentResponse {
         response.createdAt = comment.getCreatedAt();
         response.updatedAt = comment.getUpdatedAt();
         response.deletedAt = comment.getDeletedAt();
-        response.parentCommentId = comment.getParentCommentId();
+        response.parentCommentId = comment.getParentComment().getCommentId();
         return response;
     }
 
